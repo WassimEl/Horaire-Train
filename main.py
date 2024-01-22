@@ -1,4 +1,5 @@
-import init_db, create_db, read_db, update_db, delete_db
+import fn_horaire_train as fnht
+
 
 def fn_question(question, erreur):
     reponse = input(question)
@@ -6,7 +7,6 @@ def fn_question(question, erreur):
         print(erreur)
         reponse = input(question)
     return reponse
-
 
 def fn_question_int(question, erreur):
     reponse = input(question)
@@ -35,26 +35,23 @@ def fn_menu(list_menu):
     status = int(fn_question_int(q_status, e_status))
     match status:
         case 1:
-            init_app = init_db.App()
-            init_app.fn_init_db()
+            db_name = fnht.fn_get_db_name()
+            sql_init_script = fnht.fn_get_sql_script()
+            fnht.fn_init_db(db_name, sql_init_script)
             return True
         case 2:
-            create_app = create_db.App()
             boucle = True
             while boucle:
-                boucle = create_app.fn_create_db()
+                boucle = fnht.fn_create_db()
             return True
         case 3:
-            read_app = read_db.App()
-            read_app.fn_read_db()
+            
             return True
         case 4:
-            update_app = update_db.App()
-            update_app.fn_update_db()
+            
             return True
         case 5:
-            delete_app = delete_db.App()
-            delete_app.fn_delete_db()
+            
             return True
         case 6:
             print(f'Fermeture de l\'application')
