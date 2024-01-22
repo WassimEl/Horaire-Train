@@ -169,13 +169,7 @@ def fn_question_id(question, erreur):
         train_id = input(question)
     return train_id
 
-def fn_create_train_code():
-    q_status = "Entrer un code de 6 caractères pour le train (Ex : AB1234) : "
-    e_status = "\nErreur : Codes invalides \nEntrer un code de 6 caractères pour le train (Ex : AB1234) : \n"
-    train_code = fn_question_train_code(q_status, e_status)
-    return train_code
-
-def fn_update_db(train_code, train_id, db_name):
+def fn_update_train_code(train_code, train_id, db_name):
     sqliteConnection = None
     try:            
         with sqlite3.connect(db_name, timeout=10) as sqliteConnection:
@@ -198,13 +192,13 @@ def fn_update_db(train_code, train_id, db_name):
             sqliteConnection.close()
             print("The SQLite connection is closed")
     
-def fn_init_update_menu():
+def fn_init_update_train_code_menu():
     q_choix_1 = "[1] Modifier un train"
     q_choix_2 = "[2] Quitter"
     list_menu = [q_choix_1, q_choix_2]
     return list_menu
 
-def fn_update_menu(list_menu):
+def fn_update_train_code_menu(list_menu):
     print(f'\n----Menu - Projet Horaire train----')
     for item in list_menu:
         print(f'{item}')
@@ -214,27 +208,41 @@ def fn_update_menu(list_menu):
     match status:
         case 1:
             db_name = fn_get_db_name()
-            train_id = fn_question_id()
-            train_code = fn_create_train_code()
-            fn_update_db(train_code, train_id, db_name)
+            fn_read_db(db_name)
+            q_id_status = "Entrer votre choix : "
+            e_id_status = "\nErreur : Caractères invalides\n"
+            train_id = fn_question_id(q_id_status, e_id_status)
+            train_code = fn_input_train_code()
+            fn_update_train_code(train_code, train_id, db_name)
+            return True
         case 2:
             print(f'Fermeture de l\'application')
-            return False, 0, 0
+            return False
         case _:
             print(f'\nErreur : Choix non-valide\n')
-            return True, 0, 0
+            return True
+        
+def fn_update_db():
+    try:
+        list_menu = fn_init_update_train_code_menu()
+        update_db_out = fn_update_train_code_menu(list_menu)            
+    except Exception as error:
+        print(f"{error}")
+    finally:
+        return update_db_out
 
-def fn_delete_db(self):
+def fn_delete_train_code(db_name, train_id):
     sqliteConnection = None
     try:            
-        with sqlite3.connect(self.db_name, timeout=10) as sqliteConnection:
-            print(f"Connected to the database {self.db_name}")
+        with sqlite3.connect(db_name, timeout=10) as sqliteConnection:
+            print(f"Connected to the database {db_name}")
             cursor = sqliteConnection.cursor()
             try:
-                cursor.execute("DELETE FROM TRAIN WHERE train_id = 4;")                    
-                print("SQLite script executed successfully")                    
+                print(f"DELETE FROM TRAIN WHERE train_id = {train_id};")
+                cursor.execute(f"DELETE FROM TRAIN WHERE train_id = {train_id};")
+                print("SQLite command executed successfully")
             except sqlite3.Error as error:
-                print(f"Error while executing SQLite script: {error}")
+                print(f"Error while executing SQLite command: {error}")
             finally:
                 cursor.close()
     except sqlite3.Error as error:
@@ -245,3 +253,41 @@ def fn_delete_db(self):
         if sqliteConnection:
             sqliteConnection.close()
             print("The SQLite connection is closed")
+
+def fn_init_delete_train_code_menu():
+    q_choix_1 = "[1] Supprimer un train"
+    q_choix_2 = "[2] Quitter"
+    list_menu = [q_choix_1, q_choix_2]
+    return list_menu
+
+def fn_delete_train_code_menu(list_menu):
+    print(f'\n----Supprimer - Projet Horaire train----')
+    for item in list_menu:
+        print(f'{item}')
+    q_status = "Entrer votre choix (1-2) : "
+    e_status = "\nErreur : Caractères invalides\n"
+    status = int(fn_question_int(q_status, e_status))
+    match status:
+        case 1:
+            db_name = fn_get_db_name()
+            fn_read_db(db_name)
+            q_id_status = "Entrer votre choix : "
+            e_id_status = "\nErreur : Caractères invalides\n"
+            train_id = fn_question_id(q_id_status, e_id_status)
+            fn_delete_train_code(db_name, train_id)
+            return True
+        case 2:
+            print(f'Fermeture de l\'application')
+            return False
+        case _:
+            print(f'\nErreur : Choix non-valide\n')
+            return True
+        
+def fn_delete_db():
+    try:
+        list_menu = fn_init_delete_train_code_menu()
+        delete_db_out = fn_delete_train_code_menu(list_menu)            
+    except Exception as error:
+        print(f"{error}")
+    finally:
+        return delete_db_out
